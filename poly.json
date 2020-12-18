@@ -1,0 +1,49 @@
+{
+    "Name": "Poly test",
+    "Triggers": [
+        {
+            "Id": 0,
+            "Events":[
+                { "Delay": 0, "Type" : "NoteOn", "Voice" : 0, "Note": 60, "Velocity": 60 },
+                { "Delay": 200, "Type" : "NoteOff","Voice" : 0,  "Note": 60, "Velocity": 60 }
+            ]
+
+        },
+        {
+            "Id": 1,
+            "Events":[
+                { "Delay": 0, "Type" : "NoteOn","Voice" : 0,  "Note": 64, "Velocity": 60 },
+                { "Delay": 200, "Type" : "NoteOff","Voice" : 0,  "Note": 64, "Velocity": 60 }
+            ]
+
+        }
+    ],
+    "Tracks": [
+        { 
+            "Train": {
+                "Tempo": 90,
+                "AxleOffsets" : [ 25 ]
+            },
+            "Sections" : [
+                { "Offset": 0, "OnEnter": 0, "OnLeave": [ ] },
+                { "Offset": 90, "OnEnter": 0, "OnLeave": [ ] },
+                { "Offset": 180, "OnEnter": 0, "OnLeave": [ ] },
+                { "Offset": 270, "OnEnter": 0, "OnLeave": [ ] }
+            ]
+        },
+        {    
+            "Train": {
+                "Tempo": 90,
+                "AxleOffsets" : [ 5, 5  ]
+            },
+            "Sections" : [
+                { "Offset": 0, "OnEnter": 1, "OnLeave": [ ] },
+                { "Offset": 90, "OnEnter": 1, "OnLeave": [ ] },
+                { "Offset": 180, "OnEnter": 1, "OnLeave": [ ] },
+                { "Offset": 270, "OnEnter": 1, "OnLeave": [ ] }
+            ]
+        }
+
+    ]
+}
+

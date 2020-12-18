@@ -1,0 +1,57 @@
+/*
+ * MidiTrain -- MIDI sequencer and visualizer based on a train-inspired musical notation
+ *
+ * Author: Micky Faas <micky@edukitty.org>
+ * This work is released under the MIT license
+ */
+
+#pragma once
+
+#include <QThread>
+#include <QMap>
+#include <QMultiMap>
+#include "miditrain.h"
+#include "playhead.h"
+
+#define PRECISION 2 // msec
+#define BROADCAST_DIVISION 10
+
+class Composition;
+class QMidiOut;
+class QMidiEvent;
+
+class PlayThread : public QThread {
+    Q_OBJECT
+public:
+//    typedef QMultiMap<double /*time*/,QMidiEvent*> EventQueueT;
+//    typedef QMap<int /*track*/,int /*section*/> SectionQueueT;
+
+    PlayThread( QObject *parent =0 );
+    ~PlayThread();
+
+    void setComposition( const Composition* );
+    const Composition* composition() const { return _comp; }
+
+    void setPlayHead( const PlayHead& );
+    PlayHead playHead() const { return _playhead; }
+
+    void setMidiOut( QMidiOut* );
+    QMidiOut* midiOut() const { return _midiout; }
+
+    void run() override;
+
+    void stop() { requestInterruption(); }
+
+signals:
+    void positionAdvanced( PlayHead );
+
+private:
+    const Composition* _comp;
+    PlayHead _playhead;
+    QMidiOut* _midiout;
+    bool _stop;
+    TimeVarT _previous;
+    //EventQueueT _eventq;
+    //SectionQueueT _sectionq;
+
+};

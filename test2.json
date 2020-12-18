@@ -1,0 +1,67 @@
+{
+    "Name": "Test2",
+    "Triggers": [
+        {
+            "Id": 0,
+            "Events":[
+                { "Delay": 0, "Type" : "NoteOn", "Voice" : 0, "Note": 60, "Velocity": 60 },
+                { "Delay": 200, "Type" : "NoteOff","Voice" : 0,  "Note": 60, "Velocity": 60 }
+            ]
+
+        },
+        {
+            "Id": 1,
+            "Events":[
+                { "Delay": 10, "Type" : "NoteOn","Voice" : 0,  "Note": 64, "Velocity": 60 },
+                { "Delay": 210, "Type" : "NoteOff","Voice" : 0,  "Note": 64, "Velocity": 60 }
+            ]
+
+        },
+        {
+            "Id": 2,
+            "Events":[
+                { "Delay": 20, "Type" : "NoteOn","Voice" : 0,  "Note": 72, "Velocity": 60 },
+                { "Delay": 220, "Type" : "NoteOff","Voice" : 0,  "Note": 72, "Velocity": 60 }
+            ]
+
+        }
+    ],
+    "Tracks": [
+        { 
+            "Train": {
+                "Tempo": 90,
+                "AxleOffsets" : [ 25 ]
+            },
+            "Sections" : [
+                { "Offset": 45, "OnEnter": 0, "OnLeave": [ ] },
+                { "Offset": 135, "OnEnter": 0, "OnLeave": [ ] },
+                { "Offset": 225, "OnEnter": 0, "OnLeave": [ ] },
+                { "Offset": 315, "OnEnter": 0, "OnLeave": [ ] }
+            ]
+        },
+        {    
+            "Train": {
+                "Tempo": 90,
+                "AxleOffsets" : [ 5, 5  ]
+            },
+            "Sections" : [
+                { "Offset": 0, "OnEnter": 1, "OnLeave": [ ] },
+                { "Offset": 90, "OnEnter": 1, "OnLeave": [ ] },
+                { "Offset": 180, "OnEnter": 1, "OnLeave": [ ] },
+                { "Offset": 270, "OnEnter": 1, "OnLeave": [ ] }
+            ]
+        },
+        { 
+            "Train": {
+                "Tempo": 90,
+                "AxleOffsets" : [ 25,25 ]
+            },
+            "Sections" : [
+                { "Offset": 315, "OnEnter": 2, "OnLeave": [ ] }
+            ]
+        }
+
+    ]
+}
+
+

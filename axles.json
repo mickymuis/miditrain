@@ -1,0 +1,44 @@
+{
+    "Name": "Test Composition",
+    "Triggers": [
+        {
+            "Id": 0,
+            "Events":[
+                { "Delay": 0, "Type" : "NoteOn", "Voice" : 0, "Note": 60, "Velocity": 60 },
+                { "Delay": 200, "Type" : "NoteOff","Voice" : 0,  "Note": 60, "Velocity": 60 }
+            ]
+
+        },
+        {
+            "Id": 1,
+            "Events":[
+                { "Delay": 10, "Type" : "NoteOn","Voice" : 0,  "Note": 64, "Velocity": 60 },
+                { "Delay": 210, "Type" : "NoteOff","Voice" : 0,  "Note": 64, "Velocity": 60 }
+            ]
+
+        }
+    ],
+    "Tracks": [
+        { 
+            "Train": {
+                "Tempo": 90,
+                "AxleOffsets" : [ 90, 180, 270 ]
+            },
+            "Sections" : [
+                { "Offset": 0, "OnEnter": 0, "OnLeave": [ ] }
+            ]
+        },
+        {    
+            "Train": {
+                "Tempo": 90,
+                "AxleOffsets" : [ 45, 225 ]
+            },
+            "Sections" : [
+                { "Offset": 0, "OnEnter": 1, "OnLeave": [ ] }
+            ]
+        }
+
+    ]
+}
+
+
