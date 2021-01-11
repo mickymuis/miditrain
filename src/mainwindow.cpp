@@ -24,7 +24,8 @@ MainWindow::MainWindow() :
     _composition( nullptr ), 
     _thread( nullptr ),
     _midiout( nullptr ),
-    _playing( false ) { 
+    _playing( false ),
+    _restart( true ) { 
     _playhead =new PlayHead();
 
     _scoreWidget =new ScoreWidget( this );
@@ -67,7 +68,9 @@ MainWindow::MainWindow() :
 
     _timer =new QTimer( this );
     connect( _timer, &QTimer::timeout, this, &MainWindow::tick );
-
+    
+    _time.start();
+    _thread->setTimer( _time );
 }
 
 MainWindow::~MainWindow() { 
@@ -112,7 +115,7 @@ MainWindow::setComposition( Composition* comp ) {
         delete _composition;
     }
     _composition =comp;
-    _playhead->reinitialize( comp );
+    _playhead->initialize( comp );
     _scoreWidget->setComposition( comp );
     _thread->setComposition( comp );
 }
@@ -128,9 +131,16 @@ MainWindow::start() {
     if( _playing || _composition == nullptr) return;
     _playing =true;
 
-    _elapsed.start();
+    qint64 t =_time.elapsed();
+    if( _restart ) {
+        _playhead->restart( t, t );
+        _thread->setStartTime( t, t );
+    } else {
+        qint64 d =_stoptime - _playhead->origin();
+        _playhead->restart( t - d, t );
+        _thread->setStartTime( t - d, t );
+    }
     _thread->start(QThread::HighPriority);
-//    _previous = timeNow();
     _timer->start( DISPLAY_PRECISION );
 }
 
@@ -141,6 +151,8 @@ MainWindow::stop() {
 
     _timer->stop();
     _thread->requestInterruption();
+    _stoptime =_time.elapsed();
+    _restart =false;
     _midiout->controlChange( 0, 120, 0 );
 }
 
@@ -155,7 +167,7 @@ void
 MainWindow::tick() {
 //    if (event->timerId() == _timer.timerId()) {
         //TimeVarT now = timeNow();
-        _playhead->advance( (double)_elapsed.restart() );
+        _playhead->advanceTo( _time.elapsed() );
         //_previous =now;
 
         //*_playhead =_thread->playHead();

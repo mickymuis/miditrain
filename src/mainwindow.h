@@ -51,8 +51,10 @@ private:
     PlayThread* _thread;
     QMidiOut *_midiout;
     bool _playing;
+    bool _restart;
+    qint64 _stoptime;
     QTimer* _timer;
     TimeVarT _previous;
-    QElapsedTimer _elapsed;
+    QElapsedTimer _time;
 };
 

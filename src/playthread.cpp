@@ -26,7 +26,8 @@ void
 PlayThread::setComposition( const Composition* comp ) {
     if( isRunning() ) return;
     _comp =comp;
-    _playhead.reinitialize( comp );
+    //_playhead.reinitialize( comp );
+    _queue.initialize( comp );
 
     // Move to class PlayHead in the future
     
@@ -55,15 +56,26 @@ PlayThread::setMidiOut( QMidiOut* midiout ) {
 }
 
 void 
+PlayThread::setTimer( const QElapsedTimer& t ) {
+    _timer =t;
+    _queue.restart( 0, t.elapsed() );
+}
+
+void 
+PlayThread::setStartTime( qint64 origin, qint64 now ) {
+    _queue.restart( origin, now );
+}
+
+void 
 PlayThread::run() {
     if( _comp == nullptr || _midiout == nullptr ) {
         exit(0);
         return;
     }
-    QElapsedTimer elapsed;
-    elapsed.start();
+    //QElapsedTimer elapsed;
+    //elapsed.start();
     //_previous =timeNow();
-    int tick =0;
+    //int tick =0;
     while( 1 ) {
         if( isInterruptionRequested() ) {
             _midiout->controlChange( 0, 120, 0 );
@@ -71,10 +83,11 @@ PlayThread::run() {
             return;
         }
         //TimeVarT now = timeNow();
-        _playhead.advance( (double)elapsed.restart() );
+        //_playhead.advance( (double)elapsed.restart() );
+//        _queue.advance( _timer.elapsed() );
         //_previous =now;
 
-        for( const auto & track : _comp->tracks() ) {
+/*        for( const auto & track : _comp->tracks() ) {
             const PlayHead::Position& pos =_playhead.getPosition( track.index() );
             for( auto it =pos.events.begin(); it != pos.events.end(); it++ ) {
                 if( ( pos.prevAngle < pos.angle && pos.prevAngle <= it.key() && pos.angle > it.key() ) 
@@ -91,7 +104,15 @@ PlayThread::run() {
 //            emit positionAdvanced( _playhead );
 
         msleep( PRECISION );
-        tick++;
+        tick++;*/
+
+        EventQueue::Event* e =nullptr;
+        while( (e = _queue.takeFront( _timer.elapsed() ) ) ) {
+            _midiout->sendEvent( *e->midi );
+        }
+
+        msleep( _queue.minTimeUntilNextEvent( MAX_IDLE, _timer.elapsed() ) );
+        //msleep( 1 );
     }
 }
 

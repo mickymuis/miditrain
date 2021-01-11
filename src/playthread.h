@@ -10,11 +10,13 @@
 #include <QThread>
 #include <QMap>
 #include <QMultiMap>
+#include <QElapsedTimer>
 #include "miditrain.h"
 #include "playhead.h"
+#include "eventqueue.h"
 
 #define PRECISION 2 // msec
-#define BROADCAST_DIVISION 10
+#define MAX_IDLE 500
 
 class Composition;
 class QMidiOut;
@@ -38,6 +40,9 @@ public:
     void setMidiOut( QMidiOut* );
     QMidiOut* midiOut() const { return _midiout; }
 
+    void setTimer( const QElapsedTimer& t );
+    void setStartTime( qint64 origin, qint64 now );
+
     void run() override;
 
     void stop() { requestInterruption(); }
@@ -48,6 +53,8 @@ signals:
 private:
     const Composition* _comp;
     PlayHead _playhead;
+    EventQueue _queue;
+    QElapsedTimer _timer;
     QMidiOut* _midiout;
     bool _stop;
     TimeVarT _previous;

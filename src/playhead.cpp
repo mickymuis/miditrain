@@ -8,13 +8,13 @@
 #include "playhead.h"
 #include <cstdio>
 
-PlayHead::Position PlayHead::InvalidPosition = { nullptr, 0.0, 0.0, PlayHead::EventVectorT() };
+PlayHead::Position PlayHead::InvalidPosition = { 0, 0, 0, 0., nullptr };
 
 PlayHead::PlayHead() {}
 PlayHead::~PlayHead() {}
 
 void 
-PlayHead::reinitialize( const Composition* comp ) {
+PlayHead::initialize( const Composition* comp ) {
     _positions.clear();
 
     for( auto & t : comp->tracks() ) {
@@ -23,29 +23,17 @@ PlayHead::reinitialize( const Composition* comp ) {
 }
 
 void 
+PlayHead::restart( qint64 origin, qint64 now ) {
+     _origin =origin;
+    advanceTo( now );
+}
+
+void 
 PlayHead::addTrack( const Track* t, const Composition* comp ) {
-    Position p;
-    p.track =t;
-    p.angle =.0;
-    // We want to 'flatten' all possible midi events for each section of this track
-    for( const auto & sec : t->sections() ) {
-        // Obtain the trigger for this section
-        const Trigger* trig = comp->triggerById( sec.on_enter );
-        if( trig == nullptr ) continue;
-
-        // We have to add duplicates for each axle, given its offset
-        double axle =0.0;
-        for( int i=0; i < t->axleCount(); i++ ) {
-            axle += i==0 ? 0.0 : t->axleOffsets()[i-1];
-
-            // Add the trigger's midi events with their absolute offsets
-            for( const auto &event : trig->events() ) {
-                
-                double angle =sec.offset + axle + (t->tempo() * (event.delay / 1000.0));
-                p.events.insert( angle, &event.midiEvent );
-            }
-        }
-    }
+    // Tracklength in msec
+    qint64 length =(qint64)((t->length() / t->tempo()) * 1000.0);
+    
+    Position p { length, 0, 0, 0., t };
     _positions.append( p );
 }
 
@@ -90,13 +78,12 @@ PlayHead::getPosition( const Track* t ) const {
 }
 
 void 
-PlayHead::advance( double msecElapsed ) {
+PlayHead::advanceTo( qint64 now ) {
+    _now =now;
     for( auto & p : _positions ) {
-        double delta =(p.track->tempo() * msecElapsed) / 1000.0;
-        p.prevAngle =p.angle;
-        p.angle += delta;
-        //printf( "advancing by %f\n", delta );
-        if( p.angle > (double)p.track->length() ) p.angle -=(double)p.track->length();
+        p.offset = elapsedTime() % p.length;
+        p.lap = elapsedTime() / p.length;
+        p.normalizedOffset = (double)p.offset / (double)p.length;
     }
 }
 

@@ -113,7 +113,7 @@ ScoreWidget::paintEvent( QPaintEvent *event ) {
         }
 
         const int sects  =track.sections().count();
-        const double pos =_playhead != nullptr ? _playhead->getPosition( track.index() ).angle : 0.0;
+        const double pos =_playhead != nullptr ? _playhead->getPosition( track.index() ).normalizedOffset * length: 0.0;
 
         for( int i =0; i < sects; i++ ) {
             const float gap = degPerUnit * (markerSize/4.0); // degrees
