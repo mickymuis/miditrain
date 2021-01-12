@@ -4,40 +4,40 @@
         {
             "Id": 0,
             "Events":[
-                { "Delay": 0, "Type" : "NoteOn", "Voice" : 0, "Note": 60, "Velocity": 60 },
-                { "Delay": 200, "Type" : "NoteOff","Voice" : 0,  "Note": 60, "Velocity": 60 }
+                { "Type" : "Midi", "Delay": 0, "Event" : "NoteOn", "Voice" : 0, "Note": 60, "Velocity": 60 },
+                { "Type" : "Midi", "Delay": 200, "Event" : "NoteOff","Voice" : 0,  "Note": 60, "Velocity": 60 }
             ]
 
         },
         {
             "Id": 1,
             "Events":[
-                { "Delay": 0, "Type" : "NoteOn","Voice" : 0,  "Note": 64, "Velocity": 60 },
-                { "Delay": 210, "Type" : "NoteOff","Voice" : 0,  "Note": 64, "Velocity": 60 }
+                { "Type" : "Midi", "Delay": 0, "Event" : "NoteOn","Voice" : 0,  "Note": 64, "Velocity": 60 },
+                { "Type" : "Midi", "Delay": 210, "Event" : "NoteOff","Voice" : 0,  "Note": 64, "Velocity": 60 }
             ]
 
         },
         {
             "Id": 2,
             "Events":[
-                { "Delay": 0, "Type" : "NoteOn","Voice" : 0,  "Note": 45, "Velocity": 70 },
-                { "Delay": 210, "Type" : "NoteOff","Voice" : 0,  "Note": 45, "Velocity": 60 }
+                { "Type" : "Midi", "Delay": 0, "Event" : "NoteOn","Voice" : 0,  "Note": 45, "Velocity": 70 },
+                { "Type" : "Midi", "Delay": 210, "Event" : "NoteOff","Voice" : 0,  "Note": 45, "Velocity": 60 }
             ]
 
         },
         {
             "Id": 3,
             "Events":[
-                { "Delay": 0, "Type" : "NoteOn","Voice" : 0,  "Note": 79, "Velocity": 70 },
-                { "Delay": 210, "Type" : "NoteOff","Voice" : 0,  "Note": 79, "Velocity": 60 }
+                { "Type" : "Midi", "Delay": 0, "Event" : "NoteOn","Voice" : 0,  "Note": 79, "Velocity": 70 },
+                { "Type" : "Midi", "Delay": 210, "Event" : "NoteOff","Voice" : 0,  "Note": 79, "Velocity": 60 }
             ]
 
         },
         {
             "Id": 4,
             "Events":[
-                { "Delay": 0, "Type" : "NoteOn","Voice" : 0,  "Note": 84, "Velocity": 70 },
-                { "Delay": 210, "Type" : "NoteOff","Voice" : 0,  "Note": 84, "Velocity": 60 }
+                { "Type" : "Midi", "Delay": 0, "Event" : "NoteOn","Voice" : 0,  "Note": 84, "Velocity": 70 },
+                { "Type" : "Midi", "Delay": 210, "Event" : "NoteOff","Voice" : 0,  "Note": 84, "Velocity": 60 }
             ]
 
         }
@@ -50,9 +50,9 @@
                 "AxleOffsets" : [ ]
             },
             "Sections" : [
-                { "Offset": 0, "OnEnter": 0, "OnLeave": [ ] },
-                { "Offset": 20, "OnEnter": 0, "OnLeave": [ ] },
-                { "Offset": 40, "OnEnter": 0, "OnLeave": [ ] }
+                { "Offset": 0, "Trigger": 0 },
+                { "Offset": 20, "Trigger": 0 },
+                { "Offset": 40, "Trigger": 0 }
             ]
         },
         {    
@@ -62,9 +62,9 @@
                 "AxleOffsets" : [  ]
             },
             "Sections" : [
-                { "Offset": 0, "OnEnter": 1, "OnLeave": [ ] },
-                { "Offset": 30, "OnEnter": 1, "OnLeave": [ ] },
-                { "Offset": 60, "OnEnter": 1, "OnLeave": [ ] }
+                { "Offset": 0, "Trigger": 1 },
+                { "Offset": 30, "Trigger": 1 },
+                { "Offset": 60, "Trigger": 1 }
             ]
         },
         {    
@@ -74,8 +74,8 @@
                 "AxleOffsets" : [  ]
             },          
             "Sections" : [
-                { "Offset": 0, "OnEnter": 2, "OnLeave": [ ] },
-                { "Offset": 30, "OnEnter": 2, "OnLeave": [ ] }
+                { "Offset": 0, "Trigger": 2 },
+                { "Offset": 30, "Trigger": 2 }
             ]
         },
         {    
@@ -85,11 +85,11 @@
                 "AxleOffsets" : [  ]
             },
             "Sections" : [
-                { "Offset": 0, "OnEnter": 3, "OnLeave": [ ] },
-                { "Offset": 30, "OnEnter": 3, "OnLeave": [ ] },
-                { "Offset": 50, "OnEnter": 3, "OnLeave": [ ] },
-                { "Offset": 70, "OnEnter": 3, "OnLeave": [ ] },
-                { "Offset": 100, "OnEnter": 3, "OnLeave": [ ] }
+                { "Offset": 0, "Trigger": 3 },
+                { "Offset": 30, "Trigger": 3 },
+                { "Offset": 50, "Trigger": 3 },
+                { "Offset": 70, "Trigger": 3 },
+                { "Offset": 100, "Trigger": 3 }
             ]
         },
         {    
@@ -99,11 +99,11 @@
                 "AxleOffsets" : [5  ]
             },
             "Sections" : [
-                { "Offset": 0, "OnEnter": 4, "OnLeave": [ ] },
-                { "Offset": 30, "OnEnter": 4, "OnLeave": [ ] },
-                { "Offset": 50, "OnEnter": 4, "OnLeave": [ ] },
-                { "Offset": 70, "OnEnter": 4, "OnLeave": [ ] },
-                { "Offset": 100, "OnEnter": 4, "OnLeave": [ ] }
+                { "Offset": 0, "Trigger": 4 },
+                { "Offset": 30, "Trigger": 4 },
+                { "Offset": 50, "Trigger": 4 },
+                { "Offset": 70, "Trigger": 4 },
+                { "Offset": 100, "Trigger": 4 }
             ]
         }
 

@@ -33,7 +33,7 @@ EventQueue::addTrack( const Track* t, const Composition* comp ) {
     // We want to 'flatten' all possible midi events for each section of this track
     for( const auto & sec : t->sections() ) {
         // Obtain the trigger for this section
-        const Trigger* trig = comp->triggerById( sec.on_enter );
+        const Trigger* trig = comp->triggerById( sec.trigger );
         if( trig == nullptr ) continue;
 
         // We have to add duplicates for each axle, given its offset
@@ -47,7 +47,7 @@ EventQueue::addTrack( const Track* t, const Composition* comp ) {
                 
                 const double angle =sec.offset + axle;;
                 // Compute the timestamp from the angle
-                const qint64 ts = (angle / t->tempo()) * 1000.0 + event.delay;
+                const qint64 ts = (angle / t->tempo()) * 1000.0 + event.midiDelay;
                 
                 Event e ={ts % length, &event.midiEvent, trig};
                 events.append( e );

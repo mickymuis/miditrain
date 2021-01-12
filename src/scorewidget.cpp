@@ -137,14 +137,32 @@ ScoreWidget::paintEvent( QPaintEvent *event ) {
             float span  =(c*angle2 - 90.0f) - start - gap;
             painter.drawArc( circle, -start*16.f, -span*16.f ); 
             //printf( "Draw Arc %f, %f\n", -start, -span );
+            
+            const Trigger* trig = _comp->triggerById( section1.trigger );
 
-            // Now draw the perpendicular line marking the section
-            painter.drawLine(
-                    QPointF( qCos( qDegreesToRadians(start) ) * (radius-markerSize/2.f),
-                             qSin( qDegreesToRadians(start) ) * (radius-markerSize/2.f) ),
-                    QPointF( qCos( qDegreesToRadians(start) ) * (radius+markerSize/2.f),
-                             qSin( qDegreesToRadians(start) ) * (radius+markerSize/2.f) ) );
+            // Now draw the marker.
+            // For a stop-event we use a square
+            if( trig && trig->hasStopEvent() ) {
+                double o =degPerUnit * markerSize;
+                QPointF square[4] = {
+                        QPointF( qCos( qDegreesToRadians(start) ) * (radius-markerSize/2.f),
+                                 qSin( qDegreesToRadians(start) ) * (radius-markerSize/2.f) ),
+                        QPointF( qCos( qDegreesToRadians(start) ) * (radius+markerSize/2.f),
+                                 qSin( qDegreesToRadians(start) ) * (radius+markerSize/2.f) ), 
+                        QPointF( qCos( qDegreesToRadians(start+o) ) * (radius+markerSize/2.f),
+                                 qSin( qDegreesToRadians(start+o) ) * (radius+markerSize/2.f) ),
+                        QPointF( qCos( qDegreesToRadians(start+o) ) * (radius-markerSize/2.f),
+                                 qSin( qDegreesToRadians(start+o) ) * (radius-markerSize/2.f) ) };
+                painter.drawPolygon( square, 4 );
 
+            } else {
+                // For a Midi-event we use a perpendicular line marking the section
+                painter.drawLine(
+                        QPointF( qCos( qDegreesToRadians(start) ) * (radius-markerSize/2.f),
+                                 qSin( qDegreesToRadians(start) ) * (radius-markerSize/2.f) ),
+                        QPointF( qCos( qDegreesToRadians(start) ) * (radius+markerSize/2.f),
+                                 qSin( qDegreesToRadians(start) ) * (radius+markerSize/2.f) ) );
+            }
 
         }
 

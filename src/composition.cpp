@@ -76,16 +76,16 @@ eventTypeToStr( QMidiEvent::EventType t ) {
 
 /* Class Trigger implementation */
 
-Trigger::Trigger() : _id( -1 ) { }
+Trigger::Trigger() : _id( -1 ), _hasStop( false ) { }
 Trigger::~Trigger() { }
 
 Trigger
 Trigger::fromJson( const QJsonObject& json, QString* error ) {
     Trigger t;
     for( auto it =json.begin(); it != json.end(); it++ ) {
-	if( it.key().toLower() == "id" )
+	if( it.key() == "Id" )
 	    t.setId( it.value().toInt( t.id()/*default*/ ) );
-        else if( it.key().toLower() == "events" && it.value().isArray() ) {
+        else if( it.key() == "Events" && it.value().isArray() ) {
             QJsonArray array = it.value().toArray();
             for( auto it2 =array.begin(); it2 != array.end(); it2++ ) {
                 if( !t.addEventFromJson( (*it2).toObject(), error ) )
@@ -105,39 +105,43 @@ bool
 Trigger::isValid() const {
     return _id != -1 && !_events.isEmpty();
 }
+
+void
+Trigger::addEvent( const Event& e ) {
+    _events.append( e );
+    if( e.type == StopEvent )
+        _hasStop =true;
+}
     
 bool 
 Trigger::addEventFromJson( const QJsonObject& json, QString* error ) {
+    QString etxt;
     Event e;
-    // Set some default, TODO: move
-    e.midiEvent.setVoice( 0 );
-    e.midiEvent.setValue( 0 );
-    e.midiEvent.setNumber( 0 );
-    e.midiEvent.setNote( 60 );
-    e.midiEvent.setVelocity( 60 );
 
-    for( auto it =json.begin(); it != json.end(); it++ ) {
-        if( it.key().toLower() == "delay" ) {
-            e.delay = it.value().toInt( 0 );
-        }
-        else if( it.key().toLower() == "type" )
-            e.midiEvent.setType( eventTypeFromStr( it.value().toString( "" ) ) );
-        else if( it.key().toLower() == "note" )
-            e.midiEvent.setNote( it.value().toInt() );
-        else if( it.key().toLower() == "voice" )
-            e.midiEvent.setVoice( it.value().toInt() );
-        else if( it.key().toLower() == "velocity" )
-            e.midiEvent.setVelocity( it.value().toInt() );
-        else if( it.key().toLower() == "value" )
-            e.midiEvent.setValue( it.value().toInt() );
-        else if( it.key().toLower() == "number" )
-            e.midiEvent.setNumber( it.value().toInt() );
-    }
-    if( e.midiEvent.type() == QMidiEvent::Invalid ) goto ERROR;
-    _events.append( e );
+    QJsonValue jtype =json.value( "Type" );
+    if( jtype.toString() == "Midi" ) {
+        e.type = MidiEvent;
+        e.midiDelay = json.value( "Delay" ).toInt( 0 );
+        e.midiEvent.setType( eventTypeFromStr( json.value( "Event" ).toString( "" ) ) );
+        e.midiEvent.setNote( json.value( "Note" ).toInt( 60 ) );
+        e.midiEvent.setVoice( json.value( "Voice" ).toInt( 0 ) );
+        e.midiEvent.setVelocity( json.value( "Velocity" ).toInt( 60 ) );
+        e.midiEvent.setValue( json.value( "Value" ).toInt( 0 ) );
+        e.midiEvent.setNumber( json.value( "Number" ).toInt( 0 ) );
+        if( e.midiEvent.type() == QMidiEvent::Invalid ) { etxt = "Invalid Midi"; goto ERROR; }
+
+    } else if( jtype.toString() == "Stop" ) {
+        e.type = StopEvent;
+
+    } else if( jtype.toString() == "Start" ) {
+        e.type = StartEvent;
+
+    } else { etxt = "No or incorrect type"; goto ERROR; }
+    
+    addEvent( e );
     return true;
 ERROR:
-    if( error != nullptr ) *error = "Incompletely specified trigger/MIDI event";
+    if( error != nullptr ) *error = "Incompletely specified trigger - " + etxt;
     return false;
 
 }
@@ -152,18 +156,18 @@ Track
 Track::fromJson( const QJsonObject& json, QString* error ) {
     Track t;
     for( auto it =json.begin(); it != json.end(); it++ ) {
-        if( it.key().toLower() == "train" && it.value().isObject() ) {
+        if( it.key() == "Train" && it.value().isObject() ) {
             QJsonObject obj =it.value().toObject();
             for( auto it2 =obj.begin(); it2 != obj.end(); it2++ ) {
-                if( it2.key().toLower() == "tempo" )
+                if( it2.key() == "Tempo" )
                     t.setTempo( it2.value().toDouble( 0.0 ) );
-                else if( it2.key().toLower() == "length" )
+                else if( it2.key() == "Length" )
                     t.setLength( it2.value().toInt( 360 ) );
-                else if( it2.key().toLower() == "axleoffsets" )
+                else if( it2.key() == "AxleOffsets" )
                     if( !t.setOffsetsFromJson( it2.value().toArray(), error ) )
                         return t;
             }
-        } else if( it.key().toLower() == "sections" && it.value().isArray() ) {
+        } else if( it.key() == "Sections" && it.value().isArray() ) {
             QJsonArray array = it.value().toArray();
             for( auto it2 =array.begin(); it2 != array.end(); it2++ ) {
                 if( !t.addSectionFromJson( (*it2).toObject(), error ) )
@@ -204,15 +208,13 @@ Track::addSectionFromJson( const QJsonObject& json, QString *error ) {
     Section s;
     bool haveOffset =false;
     for( auto it =json.begin(); it != json.end(); it++ ) {
-        if( it.key().toLower() == "offset" ) {
+        if( it.key() == "Offset" ) {
             if( !haveOffset ) haveOffset =true;
             else goto ERROR;
             s.offset = it.value().toDouble( 0.0 );
         }
-        else if( it.key().toLower() == "onenter" )
-            s.on_enter = it.value().toInt( );
-        else if( it.key().toLower() == "onleave" )
-            s.on_leave = it.value().toInt( );
+        else if( it.key() == "Trigger" )
+            s.trigger = it.value().toInt( );
     }
     if( !haveOffset ) goto ERROR;
     _sections.append( s );
@@ -251,7 +253,7 @@ Composition::fromJson( const QByteArray& json, QString* error ) {
 
     for( auto it =root.begin(); it != root.end(); it++ ) {
         //printf( "Key: %s\n", qPrintable(it.key()) );
-        if( it.key().toLower() == "tracks" ) {
+        if( it.key() == "Tracks" ) {
             if( !it.value().isArray() || comp.tracks().count() != 0 ) {
                 if( error != nullptr ) *error = "\"tracks\" section must be specified as a single array";
                 comp.clear();
@@ -268,7 +270,7 @@ Composition::fromJson( const QByteArray& json, QString* error ) {
                 comp._tracks.append( t );
             }
         }
-        else if( it.key().toLower() == "triggers" ) {
+        else if( it.key() == "Triggers" ) {
             if( !it.value().isArray() || comp.triggers().count() != 0 ) {
                 if( error != nullptr ) *error = "\"triggers\" section must be specified as a single array";
                 comp.clear();
@@ -284,7 +286,7 @@ Composition::fromJson( const QByteArray& json, QString* error ) {
                 comp._triggers.append( t );
             }
         }
-        else if( it.key().toLower() == "name" ) {
+        else if( it.key() == "Name" ) {
             comp.setName( it.value().toString( comp.name() /*default*/ ) );
         }
     }

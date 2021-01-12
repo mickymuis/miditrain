@@ -15,9 +15,17 @@
 
 class Trigger {
 public:
+    enum EventType {
+        NoEvent,
+        MidiEvent,
+        StopEvent,
+        StartEvent
+    };
     struct Event {
-        int delay;
+        EventType type;
+        int midiDelay;
         QMidiEvent midiEvent;
+        int targets[32];
     };
 
     typedef QVector<Event> EventVectorT;
@@ -25,20 +33,26 @@ public:
     Trigger();
     ~Trigger();
 
+    void addEvent( const Event& );
+
     const EventVectorT& events() const { return _events; }
     EventVectorT& events() { return _events; }
 
     static Trigger fromJson( const QJsonObject&, QString* error =nullptr );
     
-    void setId( int i ) { _id = i; }
-    int id() const { return _id; }
+    inline void setId( int i ) { _id = i; }
+    inline int id() const { return _id; }
 
     bool isValid() const;
+
+    inline bool hasStopEvent() const { return _hasStop; }
+    void setHasStop( bool b ) { _hasStop =b; }
 
 private:
     bool addEventFromJson( const QJsonObject&, QString* error );
     EventVectorT _events;
     int _id;
+    bool _hasStop;
     
 };
 
@@ -46,7 +60,7 @@ class Track {
 public:
     struct Section {
         double offset;
-        int on_enter, on_leave;
+        int trigger;
     };
 
     typedef QVector<Section> SectionVectorT;
