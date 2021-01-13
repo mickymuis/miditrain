@@ -8,18 +8,21 @@
 #pragma once
 
 #include <QVector>
+#include "composition.h"
 
-class Composition;
+//class Composition;
 class QMidiEvent;
-class Track;
-class Trigger;
+//class Track;
+//class Trigger;
+//class Trigger::Event;
 
 class EventQueue {
 public:
     struct Event {
         qint64 timestamp;
-        const QMidiEvent* midi;
+        const Trigger::Event* event;
         const Trigger* trigger;
+        const Track* track;
 
     };
 
@@ -27,9 +30,11 @@ public:
 
     struct TrackQueue {
         qint64 length;          // Length in timestamp (msec)
-        const Track* track;     // Corresponsing Track object
+        const Track* track;     // Corresponding Track object
         EventVectorT events;    // Vector of (midi)events
         int cursor, lap;        // Index in the event vector, n-th repeat cycle
+        bool running;
+        qint64 runningTime, startTime;
     };
 
     typedef QVector<TrackQueue> TrackQueueVectorT;
@@ -43,6 +48,9 @@ public:
 
     void advance( qint64 now );
 
+    void startTrack( const Track*, qint64 now =-1 );
+    void stopTrack( const Track*, qint64 now =-1 );
+
     Event* takeFront( qint64 now =-1 );
 
     qint64 origin() const { return _origin; }
@@ -53,6 +61,10 @@ public:
 
 private:
     void addTrack( const Track* t, const Composition* );
+    TrackQueue* find( const Track* );
+    void startQueue( TrackQueue* );
+    void stopQueue( TrackQueue* );
+    qint64 elapsedTrackTime( const TrackQueue* ) const;
 
     TrackQueueVectorT _tracks;
     qint64 _origin;

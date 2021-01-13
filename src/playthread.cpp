@@ -71,11 +71,32 @@ PlayThread::run() {
 
         EventQueue::Event* e =nullptr;
         while( (e = _queue.takeFront( _timer.elapsed() ) ) ) {
-            _midiout->sendEvent( *e->midi );
+           processEvent( e );
         }
 
         msleep( _queue.minTimeUntilNextEvent( MAX_IDLE, _timer.elapsed() ) );
         //msleep( 1 );
     }
+}
+
+void
+PlayThread::processEvent( const EventQueue::Event* e ) {
+    if( !e->event ) return;
+
+    switch( e->event->type ) {
+    case Trigger::MidiEvent:
+        _midiout->sendEvent( e->event->midiEvent );
+        break;
+    case Trigger::StopEvent:
+        _queue.stopTrack( e->track );
+        break;
+    case Trigger::StartEvent:
+        _queue.startTrack( _comp->trackById( e->event->target ) );
+        break;
+    case Trigger::NoEvent:
+    default:
+        break;
+    };
+
 }
 

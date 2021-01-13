@@ -49,11 +49,11 @@ EventQueue::addTrack( const Track* t, const Composition* comp ) {
                 const qint64 ts = (angle / t->tempo()) * 1000.0;
                 if( event.type == Trigger::MidiEvent ) {
                     // For MIDI events we have to add the extra delay parameter
-                    Event e ={(ts + event.midiDelay) % length, &event.midiEvent, trig};
+                    Event e ={(ts + event.midiDelay) % length, &event, trig, t};
                     events.append( e );
                 } else if( i ==0 ) {
                     // Other events are only added for the first axle
-                    Event e ={ts % length, &event.midiEvent, trig};
+                    Event e ={ts % length, &event, trig, t};
                     events.append( e );
                 }
 
@@ -63,7 +63,7 @@ EventQueue::addTrack( const Track* t, const Composition* comp ) {
 
     std::sort( events.begin(), events.end(), [](const Event& a, const Event& b){ return a.timestamp < b.timestamp; } );
 
-    TrackQueue q ={ length, t, events, 0, 0 };
+    TrackQueue q ={ length, t, events, 0, 0, true, 0, 0 };
     _tracks.append( q );
 }
 
@@ -83,6 +83,35 @@ EventQueue::restart( qint64 origin, qint64 now ) {
 }
 
 void 
+EventQueue::startTrack( const Track* t, qint64 now ) {
+    if( now != -1 ) _now = now;
+    TrackQueue* tq =find( t );
+    startQueue( tq );
+}
+
+void 
+EventQueue::startQueue( EventQueue::TrackQueue* tq ) {
+    if( !tq || tq->running ) return;
+    tq->running =true;
+    tq->startTime =_now;
+}
+
+void 
+EventQueue::stopTrack( const Track* t, qint64 now  ) {
+    if( now != -1 ) _now = now;
+    TrackQueue* tq =find( t );
+    stopQueue( tq );
+    tq->runningTime += _now - tq->startTime;
+}
+
+void 
+EventQueue::stopQueue( EventQueue::TrackQueue* tq ) {
+    if( !tq || !tq->running ) return;
+    tq->running =false;
+
+}
+
+void 
 EventQueue::advance( qint64 now ) {
     _now =now;
 }
@@ -93,26 +122,25 @@ EventQueue::takeFront( qint64 now ) {
     // Find the first track that has an event due
     for( auto& tq : _tracks ) {
         if( tq.cursor >= tq.events.count() ) continue;
+        if( tq.running == false ) continue;
 
         qint64 timestamp = tq.events[tq.cursor].timestamp;
-        qint64 elapsedLap =elapsedTime() % tq.length;
-        qint64 lap =elapsedTime() / tq.length;
+        qint64 elapsedLap =elapsedTrackTime( &tq ) % tq.length;
+        qint64 lap =elapsedTrackTime( &tq ) / tq.length;
         // The current event must be due in the current lap
         if( timestamp <= elapsedLap
-            && tq.lap == lap ) {
+            && tq.lap == lap ) { 
             Event* e =&tq.events[tq.cursor];
             // Increment the cursor and the lap number if needed
             if( ++tq.cursor == tq.events.count() ) {
                 tq.cursor =0;
                 tq.lap++;
-            };
-            return e;;
+            }
+            return e;
         }
     }
     return nullptr;
 }
-
-
 
 qint64 
 EventQueue::minTimeUntilNextEvent( qint64 max ) const {
@@ -120,10 +148,11 @@ EventQueue::minTimeUntilNextEvent( qint64 max ) const {
     // Find the track that has an event due in the shortest amount of time
     for( const auto& tq : _tracks ) {
         if( tq.cursor >= tq.events.count() ) continue;
+        if( tq.running == false ) continue;
 
         qint64 timestamp = tq.events[tq.cursor].timestamp;
-        qint64 elapsedLap =elapsedTime() % tq.length;
-        qint64 lap =elapsedTime() / tq.length;
+        qint64 elapsedLap =elapsedTrackTime( &tq ) % tq.length;
+        qint64 lap =elapsedTrackTime( &tq ) / tq.length;
 
         if( tq.cursor == 0 && tq.lap == lap + 1 )
             time =qMin( time, timestamp + (tq.length - elapsedLap) );
@@ -134,3 +163,18 @@ EventQueue::minTimeUntilNextEvent( qint64 max ) const {
     return time;
 }
 
+EventQueue::TrackQueue* 
+EventQueue::find( const Track* t ) {
+    for( auto& tq : _tracks ) {
+        if( tq.track == t ) return &tq;
+    }
+    return nullptr;
+}
+
+qint64 
+EventQueue::elapsedTrackTime( const TrackQueue* tq ) const {
+    if( !tq ) return 0;
+    if( tq->running == false )
+        return tq->runningTime;
+    return tq->runningTime + (elapsedTime() - tq->startTime);
+}

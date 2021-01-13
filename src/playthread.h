@@ -51,6 +51,8 @@ signals:
     void positionAdvanced( PlayHead );
 
 private:
+    void processEvent( const EventQueue::Event* );
+
     const Composition* _comp;
     PlayHead _playhead;
     EventQueue _queue;

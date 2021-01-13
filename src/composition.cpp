@@ -134,6 +134,7 @@ Trigger::addEventFromJson( const QJsonObject& json, QString* error ) {
         e.type = StopEvent;
 
     } else if( jtype.toString() == "Start" ) {
+        e.target = json.value( "Target" ).toInt( -1 );
         e.type = StartEvent;
 
     } else { etxt = "No or incorrect type"; goto ERROR; }
@@ -259,7 +260,7 @@ Composition::fromJson( const QByteArray& json, QString* error ) {
                     comp.clear();
                     return comp;
                 }
-                if( t.id() == -1 )
+                if( t.id() < 0 )
                     t.setId( ++comp._maxId );
                 else
                     comp._maxId = qMax( comp._maxId, t.id() );

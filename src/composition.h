@@ -25,7 +25,7 @@ public:
         EventType type;
         int midiDelay;
         QMidiEvent midiEvent;
-        int targets[32];
+        int target;
     };
 
     typedef QVector<Event> EventVectorT;
