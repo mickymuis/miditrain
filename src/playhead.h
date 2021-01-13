@@ -32,9 +32,9 @@ public:
 
     void addTrack( const Track*, const Composition* );
     void removeTrack( const Track* );
-    void removeTrack( int trackIndex );
+    void removeTrack( int trackId );
 
-    Position getPosition( int trackIndex ) const;
+    Position getPosition( int trackId ) const;
     Position getPosition( const Track* ) const;
 
     void advanceTo( qint64 now );

@@ -44,11 +44,9 @@
     ],
     "Tracks": [
         { 
-            "Train": {
-                "Length": 70,
-                "Tempo": 50,
-                "AxleOffsets" : [ ]
-            },
+            "Length": 70,
+            "Tempo": 50,
+            "AxleOffsets" : [ ],
             "Sections" : [
                 { "Offset": 0, "Trigger": 0 },
                 { "Offset": 20, "Trigger": 0 },
@@ -56,11 +54,9 @@
             ]
         },
         {    
-            "Train": {
-                "Length": 80,
-                "Tempo": 50,
-                "AxleOffsets" : [  ]
-            },
+            "Length": 80,
+            "Tempo": 50,
+            "AxleOffsets" : [ ],
             "Sections" : [
                 { "Offset": 0, "Trigger": 1 },
                 { "Offset": 30, "Trigger": 1 },
@@ -68,22 +64,18 @@
             ]
         },
         {    
-            "Train": {
-                "Length": 50,
-                "Tempo": 50,
-                "AxleOffsets" : [  ]
-            },          
+            "Length": 50,
+            "Tempo": 50,
+            "AxleOffsets" : [ ],
             "Sections" : [
                 { "Offset": 0, "Trigger": 2 },
                 { "Offset": 30, "Trigger": 2 }
             ]
         },
         {    
-            "Train": {
-                "Length": 130,
-                "Tempo": 50,
-                "AxleOffsets" : [  ]
-            },
+            "Length": 130,
+            "Tempo": 50,
+            "AxleOffsets" : [ ],
             "Sections" : [
                 { "Offset": 0, "Trigger": 3 },
                 { "Offset": 30, "Trigger": 3 },
@@ -93,11 +85,9 @@
             ]
         },
         {    
-            "Train": {
-                "Length": 130,
-                "Tempo": 12.5,
-                "AxleOffsets" : [5  ]
-            },
+            "Length": 130,
+            "Tempo": 12.5,
+            "AxleOffsets" : [5  ],
             "Sections" : [
                 { "Offset": 0, "Trigger": 4 },
                 { "Offset": 30, "Trigger": 4 },

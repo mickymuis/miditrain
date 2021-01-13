@@ -48,9 +48,9 @@ PlayHead::removeTrack( const Track* t ) {
 }
 
 void 
-PlayHead::removeTrack( int trackIndex ) {
+PlayHead::removeTrack( int trackId ) {
     for( auto it =_positions.begin(); it != _positions.end(); it++ ) {
-        if( (*it).track->index() == trackIndex ) {
+        if( (*it).track->id() == trackId ) {
             _positions.erase( it );
             break;
         }
@@ -58,9 +58,9 @@ PlayHead::removeTrack( int trackIndex ) {
 }
 
 PlayHead::Position 
-PlayHead::getPosition( int trackIndex ) const {
+PlayHead::getPosition( int trackId ) const {
     for( auto p : _positions ) {
-        if( p.track->index() == trackIndex ) {
+        if( p.track->id() == trackId ) {
             return p;
         }
     }

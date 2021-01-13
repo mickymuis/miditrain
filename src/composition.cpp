@@ -155,25 +155,18 @@ Track::~Track() { }
 Track 
 Track::fromJson( const QJsonObject& json, QString* error ) {
     Track t;
-    for( auto it =json.begin(); it != json.end(); it++ ) {
-        if( it.key() == "Train" && it.value().isObject() ) {
-            QJsonObject obj =it.value().toObject();
-            for( auto it2 =obj.begin(); it2 != obj.end(); it2++ ) {
-                if( it2.key() == "Tempo" )
-                    t.setTempo( it2.value().toDouble( 0.0 ) );
-                else if( it2.key() == "Length" )
-                    t.setLength( it2.value().toInt( 360 ) );
-                else if( it2.key() == "AxleOffsets" )
-                    if( !t.setOffsetsFromJson( it2.value().toArray(), error ) )
-                        return t;
-            }
-        } else if( it.key() == "Sections" && it.value().isArray() ) {
-            QJsonArray array = it.value().toArray();
-            for( auto it2 =array.begin(); it2 != array.end(); it2++ ) {
-                if( !t.addSectionFromJson( (*it2).toObject(), error ) )
-                    return t;
-            }
-        }
+
+    t.setId( json.value( "Id" ).toInt( -1 ) );
+    t.setTempo( json.value( "Tempo" ).toDouble( 0.0 ) );
+    t.setLength( json.value( "Length" ).toInt( 360 ) );
+    if( !t.setOffsetsFromJson( json.value( "AxleOffsets" ).toArray(), error ) )
+        return t;
+
+    QJsonArray array = json.value( "Sections" ).toArray();
+
+    for( auto it2 =array.begin(); it2 != array.end(); it2++ ) {
+        if( !t.addSectionFromJson( (*it2).toObject(), error ) )
+            return t;
     }
 
     if( !t.isValid() ) {
@@ -229,7 +222,7 @@ ERROR:
 
 
 
-Composition::Composition() : _nextIndex(0) { }
+Composition::Composition() : _maxId(0) { }
 Composition::~Composition() { }
 
 Composition 
@@ -266,7 +259,10 @@ Composition::fromJson( const QByteArray& json, QString* error ) {
                     comp.clear();
                     return comp;
                 }
-                t.setIndex( comp._nextIndex++ );
+                if( t.id() == -1 )
+                    t.setId( ++comp._maxId );
+                else
+                    comp._maxId = qMax( comp._maxId, t.id() );
                 comp._tracks.append( t );
             }
         }
@@ -309,6 +305,14 @@ const Trigger*
 Composition::triggerById( int id ) const {
     for( const auto &trig : _triggers )
         if( trig.id() == id ) return &trig;
+
+    return nullptr;
+}
+
+const Track* 
+Composition::trackById( int id ) const {
+    for( const auto &track : _tracks )
+        if( track.id() == id ) return &track;
 
     return nullptr;
 }

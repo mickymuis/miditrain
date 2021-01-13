@@ -30,7 +30,7 @@ EventQueue::addTrack( const Track* t, const Composition* comp ) {
     // Tracklength in msec
     qint64 length =(qint64)((t->length() / t->tempo()) * 1000.0);
 
-    // We want to 'flatten' all possible midi events for each section of this track
+    // We want to 'flatten' all possible (midi) events for each section of this track
     for( const auto & sec : t->sections() ) {
         // Obtain the trigger for this section
         const Trigger* trig = comp->triggerById( sec.trigger );
@@ -41,16 +41,22 @@ EventQueue::addTrack( const Track* t, const Composition* comp ) {
         for( int i=0; i < t->axleCount(); i++ ) {
             axle += i==0 ? 0.0 : t->axleOffsets()[i-1];
 
-
-            // Add the trigger's midi events with their absolute offsets
+            // Add the trigger's (midi) events with their absolute offsets
             for( const auto &event : trig->events() ) {
                 
                 const double angle =sec.offset + axle;;
                 // Compute the timestamp from the angle
-                const qint64 ts = (angle / t->tempo()) * 1000.0 + event.midiDelay;
-                
-                Event e ={ts % length, &event.midiEvent, trig};
-                events.append( e );
+                const qint64 ts = (angle / t->tempo()) * 1000.0;
+                if( event.type == Trigger::MidiEvent ) {
+                    // For MIDI events we have to add the extra delay parameter
+                    Event e ={(ts + event.midiDelay) % length, &event.midiEvent, trig};
+                    events.append( e );
+                } else if( i ==0 ) {
+                    // Other events are only added for the first axle
+                    Event e ={ts % length, &event.midiEvent, trig};
+                    events.append( e );
+                }
+
             }
         }
     }

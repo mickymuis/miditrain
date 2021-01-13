@@ -98,7 +98,7 @@ ScoreWidget::paintEvent( QPaintEvent *event ) {
 
     float radius = 1.f;
 
-    for( auto track : _comp->tracks() ) {
+    for( const auto & track : _comp->tracks() ) {
 
         // Calculate the number of degrees of the circle that correspond to one window-space unit
         const float degPerUnit = 360.0 / (2.0 * radius * M_PI);
@@ -113,7 +113,7 @@ ScoreWidget::paintEvent( QPaintEvent *event ) {
         }
 
         const int sects  =track.sections().count();
-        const double pos =_playhead != nullptr ? _playhead->getPosition( track.index() ).normalizedOffset * length: 0.0;
+        const double pos =_playhead != nullptr ? _playhead->getPosition( &track ).normalizedOffset * length: 0.0;
 
         for( int i =0; i < sects; i++ ) {
             const float gap = degPerUnit * (markerSize/4.0); // degrees

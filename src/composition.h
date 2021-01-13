@@ -85,8 +85,8 @@ public:
     void setTempo( double d ) { _tempo =d; }
     double tempo() const { return _tempo; }
 
-    void setIndex( int i ) { _index =i; }
-    int index() const { return _index; }
+    void setId( int i ) { _id =i; }
+    int id() const { return _id; }
 
     bool isValid() const;
     
@@ -97,7 +97,7 @@ private:
     OffsetVectorT _offsets;
     double _tempo;
     int _length;
-    int _index;
+    int _id;
 };
 
 class Composition {
@@ -118,10 +118,12 @@ public:
     bool isValid() const;
 
     const TrackVectorT& tracks() const { return _tracks; }
-    TrackVectorT& tracks() { return _tracks; }
+    //TrackVectorT& tracks() { return _tracks; }
 
     const TriggerVectorT& triggers() const { return _triggers; }
-    TriggerVectorT& triggers() { return _triggers; }
+    //TriggerVectorT& triggers() { return _triggers; }
+    //
+    const Track* trackById( int id ) const;
     
     const Trigger* triggerById( int id ) const;
 
@@ -130,7 +132,7 @@ private:
     TrackVectorT _tracks;
     TriggerVectorT _triggers;
     QString _name;
-    int _nextIndex;
+    int _maxId;
 
 };
 
