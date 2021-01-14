@@ -124,7 +124,7 @@ Trigger::addEventFromJson( const QJsonObject& json, QString* error ) {
         e.midiDelay = json.value( "Delay" ).toInt( 0 );
         e.midiEvent.setType( eventTypeFromStr( json.value( "Event" ).toString( "" ) ) );
         e.midiEvent.setNote( json.value( "Note" ).toInt( 60 ) );
-        e.midiEvent.setVoice( json.value( "Voice" ).toInt( 0 ) );
+        e.midiEvent.setVoice( json.value( "Channel" ).toInt( -1 ) );
         e.midiEvent.setVelocity( json.value( "Velocity" ).toInt( 60 ) );
         e.midiEvent.setValue( json.value( "Value" ).toInt( 0 ) );
         e.midiEvent.setNumber( json.value( "Number" ).toInt( 0 ) );

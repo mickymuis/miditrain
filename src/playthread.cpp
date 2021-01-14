@@ -84,9 +84,13 @@ PlayThread::processEvent( const EventQueue::Event* e ) {
     if( !e->event ) return;
 
     switch( e->event->type ) {
-    case Trigger::MidiEvent:
-        _midiout->sendEvent( e->event->midiEvent );
+    case Trigger::MidiEvent: {
+        QMidiEvent midi =e->event->midiEvent;
+        if( midi.voice() == -1 )
+            midi.setVoice( e->track->midiChannel() );
+        _midiout->sendEvent( midi );
         break;
+    }
     case Trigger::StopEvent:
         _queue.stopTrack( e->track );
         break;
