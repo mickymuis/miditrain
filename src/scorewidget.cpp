@@ -7,7 +7,7 @@
 
 #include "scorewidget.h"
 #include "composition.h"
-#include "playhead.h"
+#include "eventqueue.h"
 #include <QPainter>
 #include <QPen>
 #include <QRect>
@@ -40,8 +40,8 @@ ScoreWidget::setComposition( Composition* comp ) {
 }
 
 void
-ScoreWidget::setPlayHead( const PlayHead* ph ) {
-    _playhead =ph;
+ScoreWidget::setEventQueue( const EventQueue* eq ) {
+    _queue =eq;
     update();
 }
 
@@ -57,10 +57,10 @@ ScoreWidget::sizeHint() const {
 
 void 
 ScoreWidget::paintEvent( QPaintEvent *event ) {
-    if( _comp == nullptr || _comp->tracks().isEmpty() ) return;
+    if( _comp == nullptr || _comp->tracks().isEmpty() || !_queue ) return;
 
     const float stroke =.02f;
-    const float markerSize =.5f;
+    const float markerSize =.4f;
     //const int count = _comp->tracks().count();
     const float radiusStep = 1.f;
     const float margin = 1.f;
@@ -98,8 +98,9 @@ ScoreWidget::paintEvent( QPaintEvent *event ) {
 
     float radius = 1.f;
 
-    for( const auto & track : _comp->tracks() ) {
+    for( const auto & tq : _queue->tracks() ) {
 
+        const Track& track =*tq.track;
         // Calculate the number of degrees of the circle that correspond to one window-space unit
         const float degPerUnit = 360.0 / (2.0 * radius * M_PI);
 //        painter.drawEllipse( QPointF(0,0), radius, radius );
@@ -113,7 +114,7 @@ ScoreWidget::paintEvent( QPaintEvent *event ) {
         }
 
         const int sects  =track.sections().count();
-        const double pos =_playhead != nullptr ? _playhead->getPosition( &track ).normalizedOffset * length: 0.0;
+        const double pos =tq.normalizedOffset * length;
 
         for( int i =0; i < sects; i++ ) {
             const float gap = degPerUnit * (markerSize/4.0); // degrees

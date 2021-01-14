@@ -10,7 +10,8 @@
 #include <QWidget>
 
 class Composition;
-class PlayHead;
+//class PlayHead;
+class EventQueue;
 
 class ScoreWidget : public QWidget {
 Q_OBJECT
@@ -21,8 +22,11 @@ public:
     void setComposition( Composition* );
     const Composition* composition() const { return _comp; }
 
-    void setPlayHead( const PlayHead* );
-    const PlayHead* playHead() const { return _playhead; };
+//    void setPlayHead( const PlayHead* );
+//    const PlayHead* playHead() const { return _playhead; };
+
+    void setEventQueue( const EventQueue* );
+    const EventQueue* eventQueue() const { return _queue; };
 
     void setDarkPalette( bool dark );
     bool hasDarkPalette() const { return _dark; }
@@ -36,7 +40,9 @@ protected:
 
 private:
     Composition* _comp;
-    const PlayHead* _playhead;
+    const EventQueue* _queue;
+//    const PlayHead* _playhead;
+
     bool _dark;
     QRect _window;
 };

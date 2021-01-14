@@ -63,7 +63,7 @@ EventQueue::addTrack( const Track* t, const Composition* comp ) {
 
     std::sort( events.begin(), events.end(), [](const Event& a, const Event& b){ return a.timestamp < b.timestamp; } );
 
-    TrackQueue q ={ length, t, events, 0, 0, true, 0, 0 };
+    TrackQueue q ={ length, 0, t, events, 0, 0, t->autoStart(), false, 0, 0, 0. };
     _tracks.append( q );
 }
 
@@ -72,13 +72,34 @@ EventQueue::restart( qint64 origin, qint64 now ) {
     _origin =origin; _now =now;
     for( auto& tq : _tracks ) {
         // Find the first event that has its timestamp in the future
+        tq.startTime =_now;
+        tq.running =tq.start =tq.track->autoStart();
         int i =0;
         for( ; i < tq.events.count(); i++ ) {
-            if( tq.events[i].timestamp >= elapsedTime() % tq.length )
+            if( tq.events[i].timestamp >= elapsedTrackTime( &tq ) % tq.length )
                 break;
         }
         tq.cursor =i == tq.events.count() ? 0 : i;
-        tq.lap =elapsedTime() / tq.length;
+        tq.lap =elapsedTrackTime( &tq ) / tq.length;
+        //startQueue( &tq );
+    }
+}
+
+void 
+EventQueue::start( qint64 now ) {
+    if( now != -1 ) _now = now;
+    for( auto& tq : _tracks ) {
+        if( tq.start ) startQueue( &tq );
+    }
+
+}
+
+void 
+EventQueue::stop( qint64 now ) {
+    if( now != -1 ) _now = now;
+    for( auto& tq : _tracks ) {
+        tq.start = tq.running;
+        stopQueue( &tq );
     }
 }
 
@@ -101,19 +122,25 @@ EventQueue::stopTrack( const Track* t, qint64 now  ) {
     if( now != -1 ) _now = now;
     TrackQueue* tq =find( t );
     stopQueue( tq );
-    tq->runningTime += _now - tq->startTime;
 }
 
 void 
 EventQueue::stopQueue( EventQueue::TrackQueue* tq ) {
     if( !tq || !tq->running ) return;
     tq->running =false;
-
+    tq->runningTime += _now - tq->startTime;
 }
 
 void 
-EventQueue::advance( qint64 now ) {
+EventQueue::advance( qint64 now, bool computeOffsets ) {
     _now =now;
+    if( computeOffsets ) {
+        for( auto& tq : _tracks ) {
+            tq.offset = elapsedTrackTime( &tq ) % tq.length;
+            // tq.lap = elapsedTrackTime( &tq ) / tq.length;
+            tq.normalizedOffset = (double)tq.offset / (double)tq.length;
+        }
+    }
 }
 
 EventQueue::Event* 
@@ -176,5 +203,5 @@ EventQueue::elapsedTrackTime( const TrackQueue* tq ) const {
     if( !tq ) return 0;
     if( tq->running == false )
         return tq->runningTime;
-    return tq->runningTime + (elapsedTime() - tq->startTime);
+    return tq->runningTime + (_now - tq->startTime);
 }

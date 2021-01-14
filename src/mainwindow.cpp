@@ -10,6 +10,7 @@
 #include "composition.h"
 #include "playhead.h"
 #include "playthread.h"
+#include "eventqueue.h"
 
 #include <QFile>
 #include <QMessageBox>
@@ -20,16 +21,17 @@
 
 MainWindow::MainWindow() : 
     QMainWindow(), 
-    _playhead( nullptr ),
+    //_playhead( nullptr ),
     _composition( nullptr ), 
     _thread( nullptr ),
     _midiout( nullptr ),
     _playing( false ),
     _restart( true ) { 
-    _playhead =new PlayHead();
 
     _scoreWidget =new ScoreWidget( this );
-    _scoreWidget->setPlayHead( _playhead );
+    _scoreWidget->setEventQueue( &_queue );
+    //_scoreWidget->setPlayHead( _playhead );
+
 
     setCentralWidget( _scoreWidget );
 
@@ -79,7 +81,7 @@ MainWindow::~MainWindow() {
     _thread->quit();
     _thread->wait();
     delete _thread;
-    delete _playhead;
+    //delete _playhead;
 }
 
 bool 
@@ -115,7 +117,8 @@ MainWindow::setComposition( Composition* comp ) {
         delete _composition;
     }
     _composition =comp;
-    _playhead->initialize( comp );
+    //_playhead->initialize( comp );
+    _queue.initialize( comp );
     _scoreWidget->setComposition( comp );
     _thread->setComposition( comp );
 }
@@ -133,12 +136,16 @@ MainWindow::start() {
 
     qint64 t =_time.elapsed();
     if( _restart ) {
-        _playhead->restart( t, t );
-        _thread->setStartTime( t, t );
+        //_playhead->restart( t, t );
+        _queue.restart( t, t );
+        _thread->queue().restart( t, t );
     } else {
-        qint64 d =_stoptime - _playhead->origin();
-        _playhead->restart( t - d, t );
-        _thread->setStartTime( t - d, t );
+        //qint64 d =_stoptime - _queue.origin();
+        //_playhead->restart( t - d, t );
+        //_queue.restart( t - d, t );
+        //_thread->setStartTime( t - d, t );
+        _queue.start( t );
+        _thread->queue().start( t );
     }
     _thread->start(QThread::HighPriority);
     _timer->start( DISPLAY_PRECISION );
@@ -150,42 +157,46 @@ MainWindow::stop() {
     _playing =false;
 
     _timer->stop();
+    qint64 t =_time.elapsed();
     _thread->requestInterruption();
     _stoptime =_time.elapsed();
     _restart =false;
     _midiout->controlChange( 0, 120, 0 );
+
+    _queue.stop( t );
+    while( _thread->isRunning() ) {}
+    _thread->queue().stop( t );
 }
 
 void 
 MainWindow::updatePosition( PlayHead ph ) {
-    *_playhead =ph;
+   // *_playhead =ph;
     _scoreWidget->update(); 
 }
 
     
 void 
 MainWindow::tick() {
-//    if (event->timerId() == _timer.timerId()) {
-        //TimeVarT now = timeNow();
-        _playhead->advanceTo( _time.elapsed() );
-        //_previous =now;
+    _queue.advance( _time.elapsed(), true );
 
-        //*_playhead =_thread->playHead();
-        _scoreWidget->update();
+    EventQueue::Event* e =nullptr;
+    while( (e = _queue.takeFront( _time.elapsed())) ) {
+        switch( e->event->type ) {
+        case Trigger::MidiEvent:
+            break;
+        case Trigger::StopEvent:
+            _queue.stopTrack( e->track );
+            break;
+        case Trigger::StartEvent:
+            _queue.startTrack( _composition->trackById( e->event->target ) );
+            break;
+        case Trigger::NoEvent:
+        default:
+            break;
 
-/*        for( const auto & track : _composition->tracks() ) {
-            const PlayHead::Position& pos =_playhead->getPosition( track.index() );
-            for( auto it =pos.events.begin(); it != pos.events.end(); it++ ) {
-                if( ( pos.prevAngle < pos.angle && pos.prevAngle <= it.key() && pos.angle > it.key() ) 
-                 || ( pos.prevAngle > pos.angle && pos.angle >= it.key() ) ) {
-                    //printf( "Event %d\n ", it.value()->type() );
-                    _midiout->sendEvent( *(it.value()) );
-                }
-            }
-        }*/
+        }
+    } 
 
+    _scoreWidget->update();
 
-  /*  } else {
-        QWidget::timerEvent(event);
-    }*/
 }

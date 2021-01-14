@@ -14,11 +14,12 @@
 #include <QTimer>
 #include <QElapsedTimer>
 
-#define DISPLAY_PRECISION 25
+#define DISPLAY_PRECISION 15
 
 class ScoreWidget;
 class Composition;
-class PlayHead;
+class EventQueue;
+//class PlayHead;
 //class PlayThread;
 class QMidiOut;
 
@@ -46,7 +47,8 @@ private slots:
 
 private:
     ScoreWidget* _scoreWidget;
-    PlayHead *_playhead;
+    //PlayHead *_playhead;
+    EventQueue _queue;
     Composition* _composition;
     PlayThread* _thread;
     QMidiOut *_midiout;

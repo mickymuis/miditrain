@@ -34,14 +34,16 @@ public:
     void setComposition( const Composition* );
     const Composition* composition() const { return _comp; }
 
-    void setPlayHead( const PlayHead& );
-    PlayHead playHead() const { return _playhead; }
+    //void setPlayHead( const PlayHead& );
+    //PlayHead playHead() const { return _playhead; }
+
+    EventQueue& queue() { return _queue; }
 
     void setMidiOut( QMidiOut* );
     QMidiOut* midiOut() const { return _midiout; }
 
     void setTimer( const QElapsedTimer& t );
-    void setStartTime( qint64 origin, qint64 now );
+//    void setStartTime( qint64 origin, qint64 now );
 
     void run() override;
 
@@ -54,7 +56,7 @@ private:
     void processEvent( const EventQueue::Event* );
 
     const Composition* _comp;
-    PlayHead _playhead;
+    //PlayHead _playhead;
     EventQueue _queue;
     QElapsedTimer _timer;
     QMidiOut* _midiout;

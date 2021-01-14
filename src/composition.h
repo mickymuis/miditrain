@@ -36,7 +36,7 @@ public:
     void addEvent( const Event& );
 
     const EventVectorT& events() const { return _events; }
-    EventVectorT& events() { return _events; }
+    //EventVectorT& events() { return _events; }
 
     static Trigger fromJson( const QJsonObject&, QString* error =nullptr );
     
@@ -71,11 +71,17 @@ public:
     
     static Track fromJson( const QJsonObject&, QString* error =nullptr );
 
+    inline bool autoStart() const { return _start; }
+    inline void setAutoStart( bool b ) { _start =b; }
+
+    inline int midiChannel() const { return _channel; }
+    inline void setMidiChannel( int i ) { _channel =i; }
+
     const SectionVectorT& sections() const { return _sections; }
-    SectionVectorT& sections() { return _sections; }
+    //SectionVectorT& sections() { return _sections; }
 
     const OffsetVectorT& axleOffsets() const { return _offsets; }
-    OffsetVectorT& axleOffsets(){ return _offsets; }
+    //OffsetVectorT& axleOffsets(){ return _offsets; }
 
     int axleCount() const { return _offsets.count() + 1; }
 
@@ -98,6 +104,8 @@ private:
     double _tempo;
     int _length;
     int _id;
+    bool _start;
+    int _channel;
 };
 
 class Composition {

@@ -157,6 +157,8 @@ Track
 Track::fromJson( const QJsonObject& json, QString* error ) {
     Track t;
 
+    t.setAutoStart( json.value( "Start" ).toBool( true ) );
+    t.setMidiChannel( json.value( "MidiChannel" ).toInt( 0 ) );
     t.setId( json.value( "Id" ).toInt( -1 ) );
     t.setTempo( json.value( "Tempo" ).toDouble( 0.0 ) );
     t.setLength( json.value( "Length" ).toInt( 360 ) );

@@ -30,11 +30,11 @@ PlayThread::setComposition( const Composition* comp ) {
 
 }
 
-void 
+/*void 
 PlayThread::setPlayHead( const PlayHead& ph ) {
     if( isRunning() ) return;
     _playhead =ph;
-}
+}*/
 
 void 
 PlayThread::setMidiOut( QMidiOut* midiout ) {
@@ -48,10 +48,10 @@ PlayThread::setTimer( const QElapsedTimer& t ) {
     _queue.restart( 0, t.elapsed() );
 }
 
-void 
+/*void 
 PlayThread::setStartTime( qint64 origin, qint64 now ) {
     _queue.restart( origin, now );
-}
+}*/
 
 void 
 PlayThread::run() {
