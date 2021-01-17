@@ -14,7 +14,7 @@
 #include <QTimer>
 #include <QElapsedTimer>
 
-#define DISPLAY_PRECISION 15
+#define DISPLAY_PRECISION 10
 
 class ScoreWidget;
 class Composition;
@@ -40,7 +40,7 @@ public slots:
     void togglePlayback();
     void start();
     void stop();
-    void updatePosition( PlayHead );
+    //void updatePosition( PlayHead );
 
 private slots:
     void tick();

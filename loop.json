@@ -1,0 +1,95 @@
+{
+    "Name": "...",
+    "Triggers": [
+        {
+            "Id": 0,
+            "Events":[
+                { "Type" : "Midi", "Delay": 0, "Event" : "NoteOn","Voice" : 0,  "Note": 38, "Velocity": 90, "Duration" : 700 }
+            ]
+
+        },
+        {
+            "Id": 1,
+            "Events":[
+                { "Type" : "Midi", "Delay": 0, "Event" : "NoteOn","Voice" : 0,  "Note": 62, "Velocity": 60, "Duration" : 100 }
+            ]
+
+        },
+        {
+            "Id": 2,
+            "Events":[
+                { "Type" : "Midi", "Delay": 0, "Event" : "NoteOn","Voice" : 0,  "Note": 69, "Velocity": 45, "Duration" : 100 }
+            ]
+
+        },
+        {
+            "Id": 3,
+            "Events":[
+                { "Type" : "Reset", "Target" : 2 }
+            ]
+
+        },
+        {
+            "Id": 4,
+            "Events":[
+                { "Type" : "Reset", "Target" : 1 }
+            ]
+
+        }
+    ],
+    "Tracks": [
+        { 
+            "Id": 1,
+            "Start" : true,
+            "Loop" : 2,
+            "MidiChannel" : 1,
+            "Length" : 8,
+            "Tempo": 3,
+            "AxleOffsets" : [ ],
+            "Sections" : [
+                { "Offset": 0, "Trigger": 2 },
+                { "Offset": 1, "Trigger": 2 },
+                { "Offset": 3, "Trigger": 2 },
+                { "Offset": 5, "Trigger": 2 },
+                { "Offset": 7, "Trigger": 2 }
+            ]
+        },
+        { 
+            "Id" : 2,
+            "Start" : true,
+            "Loop" : 3,
+            "MidiChannel" : 2,
+            "Length": 8,
+            "Tempo": 4,
+            "AxleOffsets" : [ ],
+            "Sections" : [
+                { "Offset": 1, "Trigger": 1 },
+                { "Offset": 2, "Trigger": 1 },
+                { "Offset": 4, "Trigger": 1 },
+                { "Offset": 6, "Trigger": 1 },
+                { "Offset": 7, "Trigger": 1 }
+            ]
+        },
+        { 
+            "Id": 3,
+            "Start" : true,
+            "Loop" : 0,
+            "MidiChannel" : 2,
+            "Length" : 16,
+            "Tempo": 2,
+            "AxleOffsets" : [ ],
+            "Sections" : [
+                { "Offset": 2, "Trigger": 0 },
+                { "Offset": 5, "Trigger": 0 },
+                { "Offset": 7, "Trigger": 0 },
+                { "Offset": 8, "Trigger": 0 },
+                { "Offset": 10, "Trigger": 0 },
+                { "Offset": 10, "Trigger": 3 },
+                { "Offset": 11, "Trigger": 0 },
+                { "Offset": 13, "Trigger": 0 },
+                { "Offset": 15, "Trigger": 0 },
+                { "Offset": 15, "Trigger": 4 }
+            ]
+        }
+    ]
+}

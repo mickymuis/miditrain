@@ -19,11 +19,12 @@ public:
         NoEvent,
         MidiEvent,
         StopEvent,
-        StartEvent
+        StartEvent,
+        ResetEvent
     };
     struct Event {
         EventType type;
-        int midiDelay;
+        int midiDelay, midiDuration;
         QMidiEvent midiEvent;
         int target;
     };
@@ -94,6 +95,9 @@ public:
     void setId( int i ) { _id =i; }
     int id() const { return _id; }
 
+    void setLoopCount( int i ) { _loop =i; }
+    int loopCount() const { return _loop; }
+
     bool isValid() const;
     
 private:
@@ -106,6 +110,7 @@ private:
     int _id;
     bool _start;
     int _channel;
+    int _loop;
 };
 
 class Composition {

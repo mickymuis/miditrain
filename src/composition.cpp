@@ -74,6 +74,7 @@ eventTypeToStr( QMidiEvent::EventType t ) {
     return str;
 }
 
+
 /* Class Trigger implementation */
 
 Trigger::Trigger() : _id( -1 ), _hasStop( false ) { }
@@ -122,6 +123,7 @@ Trigger::addEventFromJson( const QJsonObject& json, QString* error ) {
     if( jtype.toString() == "Midi" ) {
         e.type = MidiEvent;
         e.midiDelay = json.value( "Delay" ).toInt( 0 );
+        e.midiDuration = json.value( "Duration" ).toInt( 0 );
         e.midiEvent.setType( eventTypeFromStr( json.value( "Event" ).toString( "" ) ) );
         e.midiEvent.setNote( json.value( "Note" ).toInt( 60 ) );
         e.midiEvent.setVoice( json.value( "Channel" ).toInt( -1 ) );
@@ -136,6 +138,10 @@ Trigger::addEventFromJson( const QJsonObject& json, QString* error ) {
     } else if( jtype.toString() == "Start" ) {
         e.target = json.value( "Target" ).toInt( -1 );
         e.type = StartEvent;
+    
+    } else if( jtype.toString() == "Reset" ) {
+        e.target = json.value( "Target" ).toInt( -1 );
+        e.type = ResetEvent;
 
     } else { etxt = "No or incorrect type"; goto ERROR; }
     
@@ -160,6 +166,7 @@ Track::fromJson( const QJsonObject& json, QString* error ) {
     t.setAutoStart( json.value( "Start" ).toBool( true ) );
     t.setMidiChannel( json.value( "MidiChannel" ).toInt( 0 ) );
     t.setId( json.value( "Id" ).toInt( -1 ) );
+    t.setLoopCount( json.value( "Loop" ).toInt( 0 ) );
     t.setTempo( json.value( "Tempo" ).toDouble( 0.0 ) );
     t.setLength( json.value( "Length" ).toInt( 360 ) );
     if( !t.setOffsetsFromJson( json.value( "AxleOffsets" ).toArray(), error ) )
@@ -236,7 +243,7 @@ Composition::fromJson( const QByteArray& json, QString* error ) {
 
     if( err.error != QJsonParseError::NoError ) {
         if( error != nullptr )
-            *error = err.errorString();
+            *error = err.errorString() + " at " + QString::number( err.offset );
         return comp;
     }
 

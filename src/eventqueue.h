@@ -8,6 +8,7 @@
 #pragma once
 
 #include <QVector>
+//#include "event.h"
 #include "composition.h"
 
 //class Composition;
@@ -18,11 +19,18 @@ class QMidiEvent;
 
 class EventQueue {
 public:
+    enum EventType {
+        LoopBeginEvent,
+        TriggerEvent,
+        ImplicitNoteOffEvent
+    };
+    struct TrackQueue;
     struct Event {
+        int type;
         qint64 timestamp;
         const Trigger::Event* event;
         const Trigger* trigger;
-        const Track* track;
+        TrackQueue* trackQueue;
 
     };
 
@@ -38,10 +46,11 @@ public:
         double normalizedOffset;        // offset on [0..1)
     };
 
-    typedef QVector<TrackQueue> TrackQueueVectorT;
+    typedef QVector<TrackQueue*> TrackQueuePtrVectorT;
     
     EventQueue();
     ~EventQueue();
+    void clear();
 
     void initialize( const Composition* );
 
@@ -52,7 +61,11 @@ public:
     void advance( qint64 now, bool computeOffsets =false );
 
     void startTrack( const Track*, qint64 now =-1 );
+    void startTrack( TrackQueue*, qint64 now =-1  );
     void stopTrack( const Track*, qint64 now =-1 );
+    void stopTrack( TrackQueue*, qint64 now =-1  );
+    void resetTrack( const Track*, qint64 now =-1 );
+    void resetTrack( TrackQueue*, qint64 now =-1  );
 
     Event* takeFront( qint64 now =-1 );
 
@@ -62,16 +75,14 @@ public:
     inline qint64 minTimeUntilNextEvent( qint64 max, qint64 now ) { _now=now; return minTimeUntilNextEvent( max ); }
     inline qint64 elapsedTime() const { return _now - _origin; }
 
-    inline const TrackQueueVectorT& tracks() const { return _tracks; }
+    inline const TrackQueuePtrVectorT& tracks() const { return _tracks; }
 
 private:
     void addTrack( const Track* t, const Composition* );
     TrackQueue* find( const Track* );
-    void startQueue( TrackQueue* );
-    void stopQueue( TrackQueue* );
     qint64 elapsedTrackTime( const TrackQueue* ) const;
 
-    TrackQueueVectorT _tracks;
+    TrackQueuePtrVectorT _tracks;
     qint64 _origin;
     qint64 _now;
 

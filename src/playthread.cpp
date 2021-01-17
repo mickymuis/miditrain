@@ -81,25 +81,48 @@ PlayThread::run() {
 
 void
 PlayThread::processEvent( const EventQueue::Event* e ) {
-    if( !e->event ) return;
+    switch( e->type ) {
+    case EventQueue::TriggerEvent:
+        if( !e->event ) break;
 
-    switch( e->event->type ) {
-    case Trigger::MidiEvent: {
+        switch( e->event->type ) {
+        case Trigger::MidiEvent: {
+            QMidiEvent midi =e->event->midiEvent;
+            if( midi.voice() == -1 )
+                midi.setVoice( e->trackQueue->track->midiChannel() );
+            _midiout->sendEvent( midi );
+            break;
+        }
+        case Trigger::StopEvent:
+            _queue.stopTrack( e->trackQueue );
+            break;
+        case Trigger::StartEvent:
+            _queue.startTrack( _comp->trackById( e->event->target ) );
+            break;
+        case Trigger::ResetEvent:
+            _queue.resetTrack( _comp->trackById( e->event->target ) );
+            break;
+        case Trigger::NoEvent:
+        default:
+            break;
+        };
+        break;
+
+    case EventQueue::ImplicitNoteOffEvent: {
+        if( e->event->midiEvent.type() != QMidiEvent::NoteOn ) break;
         QMidiEvent midi =e->event->midiEvent;
         if( midi.voice() == -1 )
-            midi.setVoice( e->track->midiChannel() );
+            midi.setVoice( e->trackQueue->track->midiChannel() );
+        midi.setType( QMidiEvent::NoteOff );
         _midiout->sendEvent( midi );
         break;
     }
-    case Trigger::StopEvent:
-        _queue.stopTrack( e->track );
+    case EventQueue::LoopBeginEvent: {
+        int maxLoop = e->trackQueue->track->loopCount();
+        if( maxLoop > 0 && maxLoop == e->trackQueue->lap )
+            _queue.stopTrack( e->trackQueue );
         break;
-    case Trigger::StartEvent:
-        _queue.startTrack( _comp->trackById( e->event->target ) );
-        break;
-    case Trigger::NoEvent:
-    default:
-        break;
+        }
     };
 
 }

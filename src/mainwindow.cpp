@@ -8,7 +8,6 @@
 #include "mainwindow.h"
 #include "scorewidget.h"
 #include "composition.h"
-#include "playhead.h"
 #include "playthread.h"
 #include "eventqueue.h"
 
@@ -65,8 +64,8 @@ MainWindow::MainWindow() :
 
     _thread =new PlayThread( this );
     _thread->setMidiOut( _midiout );
-    qRegisterMetaType<PlayHead>();
-    connect( _thread, &PlayThread::positionAdvanced, this, &MainWindow::updatePosition );
+    //qRegisterMetaType<PlayHead>();
+    //connect( _thread, &PlayThread::positionAdvanced, this, &MainWindow::updatePosition );
 
     _timer =new QTimer( this );
     connect( _timer, &QTimer::timeout, this, &MainWindow::tick );
@@ -168,11 +167,11 @@ MainWindow::stop() {
     _thread->queue().stop( t );
 }
 
-void 
+/*void 
 MainWindow::updatePosition( PlayHead ph ) {
    // *_playhead =ph;
     _scoreWidget->update(); 
-}
+}*/
 
     
 void 
@@ -180,23 +179,38 @@ MainWindow::tick() {
     _queue.advance( _time.elapsed(), true );
 
     EventQueue::Event* e =nullptr;
-    while( (e = _queue.takeFront( _time.elapsed())) ) {
-        switch( e->event->type ) {
-        case Trigger::MidiEvent:
-            break;
-        case Trigger::StopEvent:
-            _queue.stopTrack( e->track );
-            break;
-        case Trigger::StartEvent:
-            _queue.startTrack( _composition->trackById( e->event->target ) );
-            break;
-        case Trigger::NoEvent:
-        default:
-            break;
+    while( (e = _queue.takeFront()) ) {
+        switch( e->type ) {
+        case EventQueue::TriggerEvent:
 
-        }
-    } 
-
+            switch( e->event->type ) {
+            case Trigger::MidiEvent:
+                break;
+            case Trigger::StopEvent:
+                _queue.stopTrack( e->trackQueue );
+                break;
+            case Trigger::StartEvent:
+                _queue.startTrack( _composition->trackById( e->event->target ) );
+                break;
+            case Trigger::ResetEvent:
+                _queue.resetTrack( _composition->trackById( e->event->target ) );
+                break;
+            case Trigger::NoEvent:
+            default:
+                break;
+            }
+            
+            break;
+        case EventQueue::LoopBeginEvent: {
+            int maxLoop = e->trackQueue->track->loopCount();
+            if( maxLoop > 0 && maxLoop == e->trackQueue->lap ) {
+                _queue.stopTrack( e->trackQueue );
+            }
+            break;
+            }
+        default: break;
+        } 
+    }
     _scoreWidget->update();
 
 }

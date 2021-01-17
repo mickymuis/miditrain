@@ -12,7 +12,6 @@
 #include <QMultiMap>
 #include <QElapsedTimer>
 #include "miditrain.h"
-#include "playhead.h"
 #include "eventqueue.h"
 
 #define PRECISION 2 // msec
@@ -49,8 +48,8 @@ public:
 
     void stop() { requestInterruption(); }
 
-signals:
-    void positionAdvanced( PlayHead );
+//signals:
+//    void positionAdvanced( PlayHead );
 
 private:
     void processEvent( const EventQueue::Event* );
