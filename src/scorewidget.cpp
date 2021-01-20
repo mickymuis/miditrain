@@ -14,6 +14,21 @@
 #include <QtMath>
 #include <cstdio>
 
+QColor
+rgbLERP( QColor c1, QColor c2, float w ) {
+    QColor d;
+    d.setRgb (
+        (c1.redF()   * (1.f-w) + c2.redF()   * w) * 255,
+        (c1.greenF() * (1.f-w) + c2.greenF() * w) * 255,
+        (c1.blueF()  * (1.f-w) + c2.blueF()  * w) * 255
+    );
+/*    fprintf( stderr, "%f, %f, %f\n",
+        c1.redF()   * (1.f-w) + c2.redF()   * w,
+        c1.greenF() * (1.f-w) + c2.greenF() * w,
+        c1.blueF()  * (1.f-w) + c2.blueF()  * w );*/
+    return d;
+}
+
 ScoreWidget::ScoreWidget( QWidget* parent ) : QWidget( parent ), _comp( nullptr ) {
     
     setBackgroundRole( QPalette::Window );
@@ -127,10 +142,12 @@ ScoreWidget::paintEvent( QPaintEvent *event ) {
             const float angle2 =(i == sects-1 ? length : 0.0) + section2.offset;
             
             // Determine if the playhead is in the current section
-            if( pos >= angle1 && pos < angle2 )
-                pen.setColor( Qt::red );
-            else if( tq->running == false )
+            if( tq->running == false )
                 pen.setColor( palette().color( QPalette::Disabled, QPalette::WindowText ) );
+            else if( pos >= angle1 && pos < angle2 ) {
+                float w = (pos-angle1) / (angle2-angle1 ); // Normalized distance
+                pen.setColor( rgbLERP( Qt::red, palette().color( QPalette::WindowText ), w ) );
+            }
             else
                 pen.setColor( palette().color( QPalette::WindowText ) );
             painter.setPen( pen );
