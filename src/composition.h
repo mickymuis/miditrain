@@ -62,6 +62,7 @@ public:
     struct Section {
         double offset;
         int trigger;
+        int transpose;
     };
 
     typedef QVector<Section> SectionVectorT;

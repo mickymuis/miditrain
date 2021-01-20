@@ -44,7 +44,7 @@ EventQueue::addTrack( const Track* t, const Composition* comp ) {
     TrackQueue* tq = new TrackQueue( { length, 0, t, EventVectorT(), 0, 0, t->autoStart(), false, 0, 0, 0. } );
     
     // We make a vector of all events in this track, starting with the 'loop begin'
-    events.append( {LoopBeginEvent, 0, nullptr, nullptr, tq} );
+    events.append( {LoopBeginEvent, 0, nullptr, nullptr, nullptr, tq} );
     
     // We want to 'flatten' all possible (midi) events for each section of this track
     for( const auto & sec : t->sections() ) {
@@ -65,18 +65,18 @@ EventQueue::addTrack( const Track* t, const Composition* comp ) {
                 const qint64 ts = (angle / t->tempo()) * 1000.0;
                 if( event.type == Trigger::MidiEvent ) {
                     // For MIDI events we have to add the extra delay parameter
-                    Event e ={TriggerEvent, (ts + event.midiDelay) % length, &event, trig, tq};
+                    Event e ={TriggerEvent, (ts + event.midiDelay) % length, &event, trig, &sec, tq};
                     events.append( e );
 
                     if( event.midiDuration > 0 ) {
                         // If 'duration' is specified, we add an automagic NoteOff
-                        Event e ={ImplicitNoteOffEvent, (ts + event.midiDelay + event.midiDuration) % length, &event, trig, tq};
+                        Event e ={ImplicitNoteOffEvent, (ts + event.midiDelay + event.midiDuration) % length, &event, trig, &sec, tq};
                         events.append( e );
                     }
 
                 } else if( i ==0 ) {
                     // Other events are only added for the first axle
-                    Event e ={TriggerEvent, ts % length, &event, trig, tq};
+                    Event e ={TriggerEvent, ts % length, &event, trig, &sec, tq};
                     events.append( e );
                 }
 

@@ -30,8 +30,8 @@ public:
         qint64 timestamp;
         const Trigger::Event* event;
         const Trigger* trigger;
+        const Track::Section* section;
         TrackQueue* trackQueue;
-
     };
 
     typedef QVector<Event> EventVectorT;

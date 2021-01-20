@@ -129,6 +129,8 @@ ScoreWidget::paintEvent( QPaintEvent *event ) {
             // Determine if the playhead is in the current section
             if( pos >= angle1 && pos < angle2 )
                 pen.setColor( Qt::red );
+            else if( tq->running == false )
+                pen.setColor( palette().color( QPalette::Disabled, QPalette::WindowText ) );
             else
                 pen.setColor( palette().color( QPalette::WindowText ) );
             painter.setPen( pen );

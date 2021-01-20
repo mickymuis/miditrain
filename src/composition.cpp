@@ -209,17 +209,11 @@ Track::setOffsetsFromJson( const QJsonArray& array, QString *error ) {
 bool 
 Track::addSectionFromJson( const QJsonObject& json, QString *error ) {
     Section s;
-    bool haveOffset =false;
-    for( auto it =json.begin(); it != json.end(); it++ ) {
-        if( it.key() == "Offset" ) {
-            if( !haveOffset ) haveOffset =true;
-            else goto ERROR;
-            s.offset = it.value().toDouble( 0.0 );
-        }
-        else if( it.key() == "Trigger" )
-            s.trigger = it.value().toInt( );
-    }
-    if( !haveOffset ) goto ERROR;
+    s.offset = json.value( "Offset" ).toDouble( -1 );
+    s.trigger = json.value( "Trigger" ).toInt( -1 );
+    s.transpose = json.value( "Transpose" ).toInt( 0 );
+    
+    if( s.offset < 0 ) goto ERROR;
     _sections.append( s );
     return true;
 ERROR:

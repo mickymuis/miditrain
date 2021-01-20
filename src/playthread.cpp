@@ -61,7 +61,9 @@ PlayThread::run() {
     }
     while( 1 ) {
         if( isInterruptionRequested() ) {
-            _midiout->controlChange( 0, 120, 0 );
+            // TODO: keep track of actually used channels
+            for( int i =0; i < 16; i++ )
+                _midiout->controlChange( i, 120, 0 );
             exit(0);
             return;
         }
@@ -90,6 +92,7 @@ PlayThread::processEvent( const EventQueue::Event* e ) {
             QMidiEvent midi =e->event->midiEvent;
             if( midi.voice() == -1 )
                 midi.setVoice( e->trackQueue->track->midiChannel() );
+            midi.setNote( midi.note() + e->section->transpose );
             _midiout->sendEvent( midi );
             break;
         }
@@ -113,6 +116,7 @@ PlayThread::processEvent( const EventQueue::Event* e ) {
         QMidiEvent midi =e->event->midiEvent;
         if( midi.voice() == -1 )
             midi.setVoice( e->trackQueue->track->midiChannel() );
+        midi.setNote( midi.note() + e->section->transpose );
         midi.setType( QMidiEvent::NoteOff );
         _midiout->sendEvent( midi );
         break;

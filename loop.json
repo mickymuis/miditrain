@@ -1,5 +1,5 @@
 {
-    "Name": "...",
+    "Name": "Demonstration of the Loop attribute and the Reset trigger",
     "Triggers": [
         {
             "Id": 0,

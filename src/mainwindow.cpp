@@ -160,11 +160,12 @@ MainWindow::stop() {
     _thread->requestInterruption();
     _stoptime =_time.elapsed();
     _restart =false;
-    _midiout->controlChange( 0, 120, 0 );
 
     _queue.stop( t );
     while( _thread->isRunning() ) {}
     _thread->queue().stop( t );
+    for( int i =0; i < 16; i++ )
+        _midiout->controlChange( i, 123, 0 );
 }
 
 /*void 
@@ -178,21 +179,28 @@ void
 MainWindow::tick() {
     _queue.advance( _time.elapsed(), true );
 
+    bool debug =false;
+
     EventQueue::Event* e =nullptr;
     while( (e = _queue.takeFront()) ) {
+        if( debug ) printf( "%lld: ", _queue.now() );
         switch( e->type ) {
         case EventQueue::TriggerEvent:
-
+            if( debug ) printf( "(TRIGGER) " );
             switch( e->event->type ) {
             case Trigger::MidiEvent:
+                if( debug ) printf( "Midi Event " );
                 break;
             case Trigger::StopEvent:
+                if( debug ) printf( "Stop " );
                 _queue.stopTrack( e->trackQueue );
                 break;
             case Trigger::StartEvent:
+                if( debug ) printf( "Start " );
                 _queue.startTrack( _composition->trackById( e->event->target ) );
                 break;
             case Trigger::ResetEvent:
+                if( debug ) printf( "Reset " );
                 _queue.resetTrack( _composition->trackById( e->event->target ) );
                 break;
             case Trigger::NoEvent:
@@ -202,14 +210,18 @@ MainWindow::tick() {
             
             break;
         case EventQueue::LoopBeginEvent: {
+            if( debug ) printf( "(LOOPBEGIN) " );
             int maxLoop = e->trackQueue->track->loopCount();
             if( maxLoop > 0 && maxLoop == e->trackQueue->lap ) {
                 _queue.stopTrack( e->trackQueue );
             }
             break;
             }
+        case EventQueue::ImplicitNoteOffEvent:
+            if( debug ) printf( "(IMPLICITNOTEOFF) " );
         default: break;
         } 
+        if( debug ) printf( "\n" );
     }
     _scoreWidget->update();
 
