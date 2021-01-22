@@ -10,6 +10,7 @@
 #include <QThread>
 #include <QMap>
 #include <QMultiMap>
+#include <QHash>
 #include <QElapsedTimer>
 #include "miditrain.h"
 #include "eventqueue.h"
@@ -50,9 +51,14 @@ public:
 
 //signals:
 //    void positionAdvanced( PlayHead );
+    void debug();
 
 private:
     void processEvent( const EventQueue::Event* );
+
+    void allNotesOff();
+    void allTrackNotesOff( const EventQueue::TrackQueue* );
+    void trackNoteOff( const EventQueue::TrackQueue*, int channel, int note, int velocity = 0, bool all =false );
 
     const Composition* _comp;
     //PlayHead _playhead;
@@ -61,7 +67,7 @@ private:
     QMidiOut* _midiout;
     bool _stop;
     TimeVarT _previous;
+    QHash<const EventQueue::TrackQueue*, QHash<int, QHash<int, int>>> _amnotes;
     //EventQueueT _eventq;
     //SectionQueueT _sectionq;
-
 };

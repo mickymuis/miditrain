@@ -68,6 +68,7 @@ public:
     void resetTrack( TrackQueue*, qint64 now =-1  );
 
     Event* takeFront( qint64 now =-1 );
+    TrackQueue* find( const Track* );
 
     qint64 origin() const { return _origin; }
     qint64 now() const { return _now; }
@@ -79,7 +80,6 @@ public:
 
 private:
     void addTrack( const Track* t, const Composition* );
-    TrackQueue* find( const Track* );
     qint64 elapsedTrackTime( const TrackQueue* ) const;
 
     TrackQueuePtrVectorT _tracks;

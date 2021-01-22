@@ -158,14 +158,15 @@ MainWindow::stop() {
     _timer->stop();
     qint64 t =_time.elapsed();
     _thread->requestInterruption();
-    _stoptime =_time.elapsed();
+    _stoptime =t;
     _restart =false;
 
     _queue.stop( t );
     while( _thread->isRunning() ) {}
     _thread->queue().stop( t );
-    for( int i =0; i < 16; i++ )
-        _midiout->controlChange( i, 123, 0 );
+//    for( int i =0; i < 16; i++ )
+//        _midiout->controlChange( i, 123, 0 );
+//    _thread->debug();
 }
 
 /*void 

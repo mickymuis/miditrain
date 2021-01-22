@@ -17,15 +17,12 @@
 QColor
 rgbLERP( QColor c1, QColor c2, float w ) {
     QColor d;
+    // For some reason setRgbF gives me weird errors here...
     d.setRgb (
         (c1.redF()   * (1.f-w) + c2.redF()   * w) * 255,
         (c1.greenF() * (1.f-w) + c2.greenF() * w) * 255,
         (c1.blueF()  * (1.f-w) + c2.blueF()  * w) * 255
     );
-/*    fprintf( stderr, "%f, %f, %f\n",
-        c1.redF()   * (1.f-w) + c2.redF()   * w,
-        c1.greenF() * (1.f-w) + c2.greenF() * w,
-        c1.blueF()  * (1.f-w) + c2.blueF()  * w );*/
     return d;
 }
 
