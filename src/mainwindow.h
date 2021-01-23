@@ -14,7 +14,8 @@
 #include <QTimer>
 #include <QElapsedTimer>
 
-#define DISPLAY_PRECISION 10
+#define UPDATE_PRECISION 5
+#define DISPLAY_PRECISION 30
 
 class ScoreWidget;
 class Composition;
@@ -55,6 +56,7 @@ private:
     bool _playing;
     bool _restart;
     qint64 _stoptime;
+    qint64 _tick;
     QTimer* _timer;
     TimeVarT _previous;
     QElapsedTimer _time;

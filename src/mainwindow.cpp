@@ -27,6 +27,8 @@ MainWindow::MainWindow() :
     _playing( false ),
     _restart( true ) { 
 
+    resize( 1000, 1000 );
+
     _scoreWidget =new ScoreWidget( this );
     _scoreWidget->setEventQueue( &_queue );
     //_scoreWidget->setPlayHead( _playhead );
@@ -147,7 +149,8 @@ MainWindow::start() {
         _thread->queue().start( t );
     }
     _thread->start(QThread::HighPriority);
-    _timer->start( DISPLAY_PRECISION );
+    _tick =0;
+    _timer->start( UPDATE_PRECISION );
 }
 
 void 
@@ -224,6 +227,9 @@ MainWindow::tick() {
         } 
         if( debug ) printf( "\n" );
     }
-    _scoreWidget->update();
+    
+    if( (_tick % DISPLAY_PRECISION) == 0 )
+        _scoreWidget->update();
 
+    _tick += UPDATE_PRECISION;
 }
